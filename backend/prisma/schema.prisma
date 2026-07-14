@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FuelType {
+  GASOLINE
+  ETHANOL
+  DIESEL
+  FLEX
+  ELECTRIC
+}
+
+enum UsageType {
+  WORK
+  PERSONAL
+}
+
+enum TechnicianRole {
+  DRIVER
+  TECHNICIAN
+  SUPERVISOR
+  OTHER
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String
+  cnpj      String?  @unique
+  email     String?  @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users       User[]
+  technicians Technician[]
+  vehicles    Vehicle[]
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model Technician {
+  id    Int             @id @default(autoincrement())
+  name  String
+  phone String?
+  role  TechnicianRole?
+
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+
+  trips    Trip[]
+  fuelings Fueling[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model Vehicle {
+  id Int @id @default(autoincrement())
+
+  brand String
+  model String
+  year  Int
+
+  plate String
+
+  fuelType FuelType
+
+  averageConsumption Float
+
+  currentKm Float @default(0)
+
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+
+  trips    Trip[]
+  fuelings Fueling[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Placa única por empresa, não globalmente
+  @@unique([plate, companyId])
+  @@index([companyId])
+}
+
+model Trip {
+  id Int @id @default(autoincrement())
+
+  initialKm Float
+  finalKm   Float
+
+  workKm     Float
+  personalKm Float
+
+  technicianId Int
+  technician   Technician @relation(fields: [technicianId], references: [id])
+
+  vehicleId Int
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Consultas do dashboard costumam filtrar por veículo + período
+  @@index([vehicleId, createdAt])
+  @@index([technicianId, createdAt])
+}
+
+model Fueling {
+  id Int @id @default(autoincrement())
+
+  liters        Float
+  totalPrice    Float
+  pricePerLiter Float
+
+  odometer Float
+
+  usageType UsageType
+
+  notes String?
+
+  technicianId Int
+  technician   Technician @relation(fields: [technicianId], references: [id])
+
+  vehicleId Int
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vehicleId, createdAt])
+  @@index([technicianId, createdAt])
+}
