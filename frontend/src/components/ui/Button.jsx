@@ -1,20 +1,15 @@
-function Button({ children, onClick, type = "button" }) {
+import { Button as MuiButton } from "@mui/material";
+
+function Button({ children, ...props }) {
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      style={{
-        background: "#2563EB",
-        color: "#FFF",
-        border: "none",
-        padding: "12px 20px",
-        borderRadius: "8px",
-        cursor: "pointer",
-        fontWeight: "bold",
-      }}
+    <MuiButton
+      variant="contained"
+      color="primary"
+      size="large"
+      {...props}
     >
       {children}
-    </button>
+    </MuiButton>
   );
 }
 

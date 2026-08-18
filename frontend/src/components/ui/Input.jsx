@@ -1,16 +1,15 @@
-function Input({ placeholder, value, onChange, type = "text" }) {
+import { TextField } from "@mui/material";
+
+function Input({ placeholder, value, onChange, type = "text", label, ...props }) {
   return (
-    <input
+    <TextField
+      fullWidth
       type={type}
+      label={label}
       placeholder={placeholder}
       value={value}
       onChange={onChange}
-      style={{
-        width: "100%",
-        padding: "12px",
-        border: "1px solid #DDD",
-        borderRadius: "8px",
-      }}
+      {...props}
     />
   );
 }

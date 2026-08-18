@@ -1,51 +1,55 @@
-function Modal({ isOpen, title, children, onClose }) {
-  if (!isOpen) return null;
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Typography,
+} from "@mui/material";
 
+import CloseIcon from "@mui/icons-material/Close";
+
+function Modal({
+  isOpen,
+  title,
+  children,
+  onClose,
+}) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,.45)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 999,
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      fullWidth
+      maxWidth="md"
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          p: 1,
+        },
       }}
     >
-      <div
-        style={{
-          width: "550px",
-          background: "#FFF",
-          borderRadius: "12px",
-          padding: "25px",
+      <DialogTitle
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "20px",
-          }}
+        <Typography
+          variant="h5"
+          fontWeight="bold"
         >
-          <h2>{title}</h2>
+          {title}
+        </Typography>
 
-          <button
-            onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              cursor: "pointer",
-              fontSize: "22px",
-            }}
-          >
-            ✖
-          </button>
-        </div>
+        <IconButton onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
+      <DialogContent dividers>
         {children}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -1,26 +1,37 @@
+import { Box, Toolbar } from "@mui/material";
+
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
+const drawerWidth = 260;
+
 function MainLayout({ children }) {
   return (
-    <div style={{ display: "flex" }}>
+    <Box sx={{ display: "flex" }}>
       <Sidebar />
 
-      <div
-        style={{
-          marginLeft: "250px",
-          width: "100%",
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
           minHeight: "100vh",
-          background: "#f8fafc",
+          backgroundColor: "background.default",
         }}
       >
+        {/* Espaço da Sidebar */}
+        <Toolbar />
+
         <Header />
 
-        <main style={{ padding: "30px" }}>
+        <Box
+          sx={{
+            p: 4,
+          }}
+        >
           {children}
-        </main>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

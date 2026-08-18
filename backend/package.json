@@ -17,10 +17,13 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
     "jsonwebtoken": "^9.0.3",
-    "prisma": "^6.19.3"
+    "nodemailer": "^6.9.16",
+    "prisma": "^6.19.3",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.14"
   }
 }

@@ -1,16 +1,113 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
-import Login from "../pages/Login/Login";
 import Dashboard from "../pages/Dashboard/Dashboard";
+import Login from "../pages/Login/Login";
+import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword/ResetPassword";
+
 import Vehicles from "../pages/Vehicles/Vehicles";
+import Technicians from "../pages/Technicians/Technicians";
+import Trips from "../pages/Trips/Trips";
+import Fuelings from "../pages/Fuelings/Fuelings";
+import Reports from "../pages/Reports/Reports";
+import Maintenances from "../pages/Maintenances/Maintenances";
+
+import PrivateRoute from "./PrivateRoute";
 
 function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/vehicles" element={<Vehicles />} />
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Dashboard */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Veículos */}
+        <Route
+          path="/vehicles"
+          element={
+            <PrivateRoute>
+              <Vehicles />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Técnicos */}
+        <Route
+          path="/technicians"
+          element={
+            <PrivateRoute>
+              <Technicians />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Viagens */}
+        <Route
+          path="/trips"
+          element={
+            <PrivateRoute>
+              <Trips />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Abastecimentos */}
+        <Route
+          path="/fuelings"
+          element={
+            <PrivateRoute>
+              <Fuelings />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Manutenções */}
+        <Route
+          path="/maintenances"
+          element={
+            <PrivateRoute>
+              <Maintenances />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Relatórios */}
+        <Route
+          path="/reports"
+          element={
+            <PrivateRoute>
+              <Reports />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Qualquer rota inválida */}
+        <Route
+          path="*"
+          element={<Navigate to="/dashboard" replace />}
+        />
       </Routes>
     </BrowserRouter>
   );

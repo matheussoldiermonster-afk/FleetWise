@@ -7,6 +7,126 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Company {
+  id          Int          @id @default(autoincrement())
+  name        String
+  cnpj        String?      @unique
+  email       String?      @unique
+  phone       String?
+  costPerKm   Float?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  technicians Technician[]
+  users       User[]
+  vehicles    Vehicle[]
+}
+
+model User {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  password          String
+  companyId         Int
+  resetToken        String?
+  resetTokenExpires DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  company           Company   @relation(fields: [companyId], references: [id])
+}
+
+model Technician {
+  id           Int             @id @default(autoincrement())
+  name         String
+  phone        String?
+  companyId    Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  role         TechnicianRole?
+  maintenances Maintenance[]
+  company      Company         @relation(fields: [companyId], references: [id])
+  trips        Trip[]
+
+  @@index([companyId])
+}
+
+model Vehicle {
+  id                 Int           @id @default(autoincrement())
+  brand              String
+  model              String
+  plate              String
+  averageConsumption Float
+  companyId          Int
+  createdAt          DateTime      @default(now())
+  currentKm          Float         @default(0)
+  year               Int
+  updatedAt          DateTime      @updatedAt
+  fuelType           FuelType
+  reimbursable       Boolean       @default(false)
+  fuelings           Fueling[]
+  maintenances       Maintenance[]
+  trips              Trip[]
+  company            Company       @relation(fields: [companyId], references: [id])
+
+  @@unique([plate, companyId])
+  @@index([companyId])
+}
+
+model Fueling {
+  id               Int      @id @default(autoincrement())
+  liters           Float
+  odometer         Int
+  vehicleId        Int
+  createdAt        DateTime @default(now())
+  notes            String?
+  date             DateTime
+  fuelType         FuelType
+  gasStation       String?
+  responsible      String?
+  totalValue       Float
+  consumptionRate  Float?
+  vehicle          Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model Trip {
+  id             Int        @id @default(autoincrement())
+  initialKm      Float
+  breakStartKm   Float?
+  breakEndKm     Float?
+  finalKm        Float
+  initialTime    String?
+  breakStartTime String?
+  breakEndTime   String?
+  finalTime      String?
+  workKm         Float
+  personalKm     Float
+  technicianId   Int
+  vehicleId      Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  technician     Technician @relation(fields: [technicianId], references: [id])
+  vehicle        Vehicle    @relation(fields: [vehicleId], references: [id])
+
+  @@index([technicianId, createdAt])
+  @@index([vehicleId, createdAt])
+}
+
+model Maintenance {
+  id           Int             @id @default(autoincrement())
+  type         MaintenanceType
+  currentKm    Float
+  nextKm       Float
+  description  String?
+  performedAt  DateTime        @default(now())
+  vehicleId    Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  technicianId Int?
+  technician   Technician?     @relation(fields: [technicianId], references: [id])
+  vehicle      Vehicle         @relation(fields: [vehicleId], references: [id])
+
+  @@index([vehicleId])
+}
+
 enum FuelType {
   GASOLINE
   ETHANOL
@@ -27,127 +147,29 @@ enum TechnicianRole {
   OTHER
 }
 
-model Company {
+enum MaintenanceType {
+  OIL_CHANGE
+  OIL_FILTER
+  AIR_FILTER
+  FUEL_FILTER
+  BRAKE_PADS
+  BRAKE_DISC
+  TIRES
+  BATTERY
+  BELT
+  INSPECTION
+  INSURANCE
+  LICENSING
+  OTHER
+}
+
+model NotificationDismissal {
   id        Int      @id @default(autoincrement())
-  name      String
-  cnpj      String?  @unique
-  email     String?  @unique
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  users       User[]
-  technicians Technician[]
-  vehicles    Vehicle[]
-}
-
-model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String @unique
-  password String
-
   companyId Int
-  company   Company @relation(fields: [companyId], references: [id])
-
+  key       String
+  value     Float
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
+  @@unique([companyId, key])
   @@index([companyId])
-}
-
-model Technician {
-  id    Int             @id @default(autoincrement())
-  name  String
-  phone String?
-  role  TechnicianRole?
-
-  companyId Int
-  company   Company @relation(fields: [companyId], references: [id])
-
-  trips    Trip[]
-  fuelings Fueling[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([companyId])
-}
-
-model Vehicle {
-  id Int @id @default(autoincrement())
-
-  brand String
-  model String
-  year  Int
-
-  plate String
-
-  fuelType FuelType
-
-  averageConsumption Float
-
-  currentKm Float @default(0)
-
-  companyId Int
-  company   Company @relation(fields: [companyId], references: [id])
-
-  trips    Trip[]
-  fuelings Fueling[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Placa única por empresa, não globalmente
-  @@unique([plate, companyId])
-  @@index([companyId])
-}
-
-model Trip {
-  id Int @id @default(autoincrement())
-
-  initialKm Float
-  finalKm   Float
-
-  workKm     Float
-  personalKm Float
-
-  technicianId Int
-  technician   Technician @relation(fields: [technicianId], references: [id])
-
-  vehicleId Int
-  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Consultas do dashboard costumam filtrar por veículo + período
-  @@index([vehicleId, createdAt])
-  @@index([technicianId, createdAt])
-}
-
-model Fueling {
-  id Int @id @default(autoincrement())
-
-  liters        Float
-  totalPrice    Float
-  pricePerLiter Float
-
-  odometer Float
-
-  usageType UsageType
-
-  notes String?
-
-  technicianId Int
-  technician   Technician @relation(fields: [technicianId], references: [id])
-
-  vehicleId Int
-  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([vehicleId, createdAt])
-  @@index([technicianId, createdAt])
 }

@@ -1,7 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../services/api";
 
-function VehicleForm({ onSuccess }) {
+import {
+  Grid,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Box,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
+
+import { useSnackbar } from "notistack";
+
+function VehicleForm({ vehicle, onSuccess }) {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [form, setForm] = useState({
     brand: "",
     model: "",
@@ -11,7 +28,24 @@ function VehicleForm({ onSuccess }) {
     averageConsumption: "",
     currentKm: "",
     companyId: 1,
+    reimbursable: false,
   });
+
+  useEffect(() => {
+    if (vehicle) {
+      setForm({
+        brand: vehicle.brand,
+        model: vehicle.model,
+        year: vehicle.year,
+        plate: vehicle.plate,
+        fuelType: vehicle.fuelType,
+        averageConsumption: vehicle.averageConsumption,
+        currentKm: vehicle.currentKm,
+        companyId: vehicle.companyId,
+        reimbursable: vehicle.reimbursable || false,
+      });
+    }
+  }, [vehicle]);
 
   function handleChange(e) {
     setForm({
@@ -20,19 +54,39 @@ function VehicleForm({ onSuccess }) {
     });
   }
 
+  function handleCheckboxChange(e) {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.checked,
+    });
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
-    try {
-      await api.post("/vehicles", {
-        ...form,
-        year: Number(form.year),
-        averageConsumption: Number(form.averageConsumption),
-        currentKm: Number(form.currentKm),
-        companyId: Number(form.companyId),
-      });
+    const payload = {
+      ...form,
+      year: Number(form.year),
+      averageConsumption: Number(form.averageConsumption),
+      currentKm: Number(form.currentKm),
+      companyId: Number(form.companyId),
+      reimbursable: Boolean(form.reimbursable),
+    };
 
-      alert("Veículo cadastrado com sucesso!");
+    try {
+      if (vehicle) {
+        await api.put(`/vehicles/${vehicle.id}`, payload);
+
+        enqueueSnackbar("Veículo atualizado com sucesso!", {
+          variant: "success",
+        });
+      } else {
+        await api.post("/vehicles", payload);
+
+        enqueueSnackbar("Veículo cadastrado com sucesso!", {
+          variant: "success",
+        });
+      }
 
       setForm({
         brand: "",
@@ -43,93 +97,130 @@ function VehicleForm({ onSuccess }) {
         averageConsumption: "",
         currentKm: "",
         companyId: 1,
+        reimbursable: false,
       });
 
       onSuccess();
     } catch (error) {
-      alert("Erro ao cadastrar veículo.");
       console.error(error);
+
+      enqueueSnackbar("Erro ao salvar veículo.", {
+        variant: "error",
+      });
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        name="brand"
-        placeholder="Marca"
-        value={form.brand}
-        onChange={handleChange}
-      />
+    <Box component="form" onSubmit={handleSubmit}>
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            label="Marca"
+            name="brand"
+            value={form.brand}
+            onChange={handleChange}
+          />
+        </Grid>
 
-      <br /><br />
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            label="Modelo"
+            name="model"
+            value={form.model}
+            onChange={handleChange}
+          />
+        </Grid>
 
-      <input
-        name="model"
-        placeholder="Modelo"
-        value={form.model}
-        onChange={handleChange}
-      />
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            type="number"
+            label="Ano"
+            name="year"
+            value={form.year}
+            onChange={handleChange}
+          />
+        </Grid>
 
-      <br /><br />
+        <Grid size={{ xs: 12, md: 4 }}>
+          <TextField
+            fullWidth
+            label="Placa"
+            name="plate"
+            value={form.plate}
+            onChange={handleChange}
+          />
+        </Grid>
 
-      <input
-        name="year"
-        type="number"
-        placeholder="Ano"
-        value={form.year}
-        onChange={handleChange}
-      />
+        <Grid size={{ xs: 12, md: 4 }}>
+          <FormControl fullWidth>
+            <InputLabel>Combustível</InputLabel>
 
-      <br /><br />
+            <Select
+              label="Combustível"
+              name="fuelType"
+              value={form.fuelType}
+              onChange={handleChange}
+            >
+              <MenuItem value="FLEX">Flex</MenuItem>
+              <MenuItem value="GASOLINE">Gasolina</MenuItem>
+              <MenuItem value="ETHANOL">Etanol</MenuItem>
+              <MenuItem value="DIESEL">Diesel</MenuItem>
+              <MenuItem value="ELECTRIC">Elétrico</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-      <input
-        name="plate"
-        placeholder="Placa"
-        value={form.plate}
-        onChange={handleChange}
-      />
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            type="number"
+            label="Consumo Médio (Km/L)"
+            name="averageConsumption"
+            inputProps={{ step: 0.1 }}
+            value={form.averageConsumption}
+            onChange={handleChange}
+          />
+        </Grid>
 
-      <br /><br />
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            type="number"
+            label="Quilometragem Atual"
+            name="currentKm"
+            value={form.currentKm}
+            onChange={handleChange}
+          />
+        </Grid>
 
-      <select
-        name="fuelType"
-        value={form.fuelType}
-        onChange={handleChange}
-      >
-        <option value="FLEX">Flex</option>
-        <option value="GASOLINE">Gasolina</option>
-        <option value="ETHANOL">Etanol</option>
-        <option value="DIESEL">Diesel</option>
-        <option value="ELECTRIC">Elétrico</option>
-      </select>
+        <Grid size={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="reimbursable"
+                checked={form.reimbursable}
+                onChange={handleCheckboxChange}
+              />
+            }
+            label="Carro particular do técnico (reembolso por combustível — gera saldo de KM disponível)"
+          />
+        </Grid>
 
-      <br /><br />
-
-      <input
-        name="averageConsumption"
-        type="number"
-        step="0.1"
-        placeholder="Consumo Médio (Km/L)"
-        value={form.averageConsumption}
-        onChange={handleChange}
-      />
-
-      <br /><br />
-
-      <input
-        name="currentKm"
-        type="number"
-        placeholder="Quilometragem Atual"
-        value={form.currentKm}
-        onChange={handleChange}
-      />
-
-      <br /><br />
-
-      <button type="submit">
-        Salvar Veículo
-      </button>
-    </form>
+        <Grid size={12}>
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            fullWidth
+          >
+            {vehicle ? "Atualizar Veículo" : "Salvar Veículo"}
+          </Button>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 
