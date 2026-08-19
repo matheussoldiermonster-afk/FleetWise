@@ -16,11 +16,11 @@ const { z } = require("zod");
 // Em produção, defina FRONTEND_URL no .env com a URL real do frontend
 // (ex: https://app.suaempresa.com). Sem essa variável, cai no padrão
 // do Vite em desenvolvimento (localhost:5173/5174).
-const allowedOrigins = (
-  process.env.FRONTEND_URL || "http://localhost:5173,http://localhost:5174"
-)
-  .split(",")
-  .map((url) => url.trim());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
 
 const corsOptions = {
   origin(origin, callback) {
