@@ -1,5 +1,6 @@
 const express = require("express");
-const cors = require("cors");
+
+const { corsMiddleware, generalRateLimiter } = require("./middlewares/security");
 
 const vehicleRoutes = require("./routes/vehicleRoutes");
 const technicianRoutes = require("./routes/technicianRoutes");
@@ -15,7 +16,13 @@ const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
-app.use(cors());
+// Necessário para o rate limiting funcionar corretamente atrás de um
+// proxy reverso (Render, Railway, Vercel, Nginx etc.) — sem isso, todos
+// os usuários são enxergados como um IP só depois do deploy.
+app.set("trust proxy", 1);
+
+app.use(corsMiddleware);
+app.use(generalRateLimiter);
 app.use(express.json());
 
 app.get("/", (req, res) => {
