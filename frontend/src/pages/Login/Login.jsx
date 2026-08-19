@@ -234,6 +234,13 @@ function Login() {
                 Esqueceu sua senha?
               </Link>
             </Typography>
+
+            <Typography textAlign="center">
+              Não tem conta?{" "}
+              <Link component={RouterLink} to="/register">
+                Criar conta
+              </Link>
+            </Typography>
           </Box>
         </Box>
       </Box>

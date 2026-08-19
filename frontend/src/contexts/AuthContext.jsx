@@ -27,6 +27,10 @@ export function AuthProvider({ children }) {
 
     const { token, user } = response.data;
 
+    loginWithToken(token, user);
+  }
+
+  function loginWithToken(token, user) {
     localStorage.setItem("@fleetwise_token", token);
     localStorage.setItem("@fleetwise_user", JSON.stringify(user));
 
@@ -49,6 +53,7 @@ export function AuthProvider({ children }) {
       value={{
         user,
         login,
+        loginWithToken,
         logout,
         authenticated: !!user,
         loading,

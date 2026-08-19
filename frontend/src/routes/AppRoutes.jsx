@@ -3,10 +3,12 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Login from "../pages/Login/Login";
 import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
+import Register from "../pages/Register/Register";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
 
 import Vehicles from "../pages/Vehicles/Vehicles";
 import Technicians from "../pages/Technicians/Technicians";
+import Trips from "../pages/Trips/Trips";
 import Fuelings from "../pages/Fuelings/Fuelings";
 import Reports from "../pages/Reports/Reports";
 import Maintenances from "../pages/Maintenances/Maintenances";
@@ -20,6 +22,7 @@ function AppRoutes() {
         {/* Login */}
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
@@ -46,8 +49,7 @@ function AppRoutes() {
         <Route
           path="/vehicles"
           element={
-            <PrivateRoute>npm run build
-              
+            <PrivateRoute>
               <Vehicles />
             </PrivateRoute>
           }
@@ -64,6 +66,14 @@ function AppRoutes() {
         />
 
         {/* Viagens */}
+        <Route
+          path="/trips"
+          element={
+            <PrivateRoute>
+              <Trips />
+            </PrivateRoute>
+          }
+        />
 
         {/* Abastecimentos */}
         <Route
