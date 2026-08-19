@@ -46,7 +46,8 @@ function AppRoutes() {
         <Route
           path="/vehicles"
           element={
-            <PrivateRoute>
+            <PrivateRoute>npm run build
+              
               <Vehicles />
             </PrivateRoute>
           }
