@@ -1,12 +1,49 @@
 const prisma = require("../config/prisma");
 const bcrypt = require("bcrypt");
 const jwt = require("../auth/jwt");
+const { onlyDigits, isValidCPF, isValidCNPJ } = require("../utils/documentValidators");
 
 async function createCompany(data) {
   if (!data.ownerName || !data.ownerEmail || !data.ownerPassword) {
     throw new Error(
-      "Informe nome, e-mail e senha do usuário responsável pela empresa."
+      "Informe nome, e-mail e senha do usuário responsável."
     );
+  }
+
+  const personType = data.personType === "INDIVIDUAL" ? "INDIVIDUAL" : "COMPANY";
+
+  let cpf = null;
+  let cnpj = null;
+  let name = data.name;
+
+  if (personType === "INDIVIDUAL") {
+    if (!isValidCPF(data.cpf)) {
+      throw new Error("CPF inválido.");
+    }
+
+    cpf = onlyDigits(data.cpf);
+    // Pessoa física não precisa digitar "razão social" — usa o próprio nome.
+    name = name || data.ownerName;
+
+    const cpfInUse = await prisma.company.findUnique({ where: { cpf } });
+    if (cpfInUse) {
+      throw new Error("Já existe uma conta cadastrada com esse CPF.");
+    }
+  } else {
+    if (!name) {
+      throw new Error("Informe o nome/razão social da empresa.");
+    }
+
+    if (!isValidCNPJ(data.cnpj)) {
+      throw new Error("CNPJ inválido.");
+    }
+
+    cnpj = onlyDigits(data.cnpj);
+
+    const cnpjInUse = await prisma.company.findUnique({ where: { cnpj } });
+    if (cnpjInUse) {
+      throw new Error("Já existe uma empresa cadastrada com esse CNPJ.");
+    }
   }
 
   const emailInUse = await prisma.user.findUnique({
@@ -22,10 +59,12 @@ async function createCompany(data) {
   const { company, user } = await prisma.$transaction(async (tx) => {
     const company = await tx.company.create({
       data: {
-        name: data.name,
-        cnpj: data.cnpj,
-        email: data.email,
-        phone: data.phone,
+        name,
+        personType,
+        cpf,
+        cnpj,
+        email: data.email || null,
+        phone: data.phone || null,
       },
     });
 

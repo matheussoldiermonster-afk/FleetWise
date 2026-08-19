@@ -7,10 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PersonType {
+  INDIVIDUAL
+  COMPANY
+}
+
 model Company {
   id          Int          @id @default(autoincrement())
   name        String
   cnpj        String?      @unique
+  cpf         String?      @unique
+  personType  PersonType   @default(COMPANY)
   email       String?      @unique
   phone       String?
   costPerKm   Float?

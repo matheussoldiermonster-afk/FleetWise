@@ -16,11 +16,11 @@ const { z } = require("zod");
 // Em produção, defina FRONTEND_URL no .env com a URL real do frontend
 // (ex: https://app.suaempresa.com). Sem essa variável, cai no padrão
 // do Vite em desenvolvimento (localhost:5173/5174).
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+const allowedOrigins = (
+  process.env.FRONTEND_URL || "http://localhost:5173,http://localhost:5174"
+)
+  .split(",")
+  .map((url) => url.trim());
 
 const corsOptions = {
   origin(origin, callback) {
@@ -105,8 +105,10 @@ const schemas = {
   }),
 
   createCompany: z.object({
-    name: z.string().trim().min(2, "Nome da empresa é obrigatório."),
+    personType: z.enum(["INDIVIDUAL", "COMPANY"]).optional(),
+    name: z.string().trim().optional().nullable(),
     cnpj: z.string().trim().optional().nullable(),
+    cpf: z.string().trim().optional().nullable(),
     email: z.string().trim().email("E-mail da empresa inválido.").optional().nullable(),
     phone: z.string().trim().optional().nullable(),
     ownerName: z.string().trim().min(2, "Nome do responsável é obrigatório."),
