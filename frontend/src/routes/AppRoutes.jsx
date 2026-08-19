@@ -7,7 +7,6 @@ import ResetPassword from "../pages/ResetPassword/ResetPassword";
 
 import Vehicles from "../pages/Vehicles/Vehicles";
 import Technicians from "../pages/Technicians/Technicians";
-import Trips from "../pages/Trips/Trips";
 import Fuelings from "../pages/Fuelings/Fuelings";
 import Reports from "../pages/Reports/Reports";
 import Maintenances from "../pages/Maintenances/Maintenances";
@@ -64,14 +63,6 @@ function AppRoutes() {
         />
 
         {/* Viagens */}
-        <Route
-          path="/trips"
-          element={
-            <PrivateRoute>
-              <Trips />
-            </PrivateRoute>
-          }
-        />
 
         {/* Abastecimentos */}
         <Route
