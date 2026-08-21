@@ -76,11 +76,15 @@ function FuelingForm({ onSuccess }) {
 
     try {
       await api.post("/fuelings", {
-        ...form,
         vehicleId: Number(form.vehicleId),
+        date: form.date,
         odometer: Number(form.odometer),
         liters: Number(form.liters),
         totalValue: Number(form.totalValue),
+        fuelType: form.fuelType,
+        gasStation: form.gasStation,
+        responsible: form.responsible,
+        notes: form.notes,
         ...(selectedVehicle?.reimbursable &&
           form.consumptionRate !== "" && {
             consumptionRate: Number(form.consumptionRate),
@@ -92,7 +96,10 @@ function FuelingForm({ onSuccess }) {
       onSuccess();
     } catch (error) {
       console.error(error);
-      enqueueSnackbar("Erro ao cadastrar abastecimento.", { variant: "error" });
+      enqueueSnackbar(
+        error.response?.data?.message || "Erro ao cadastrar abastecimento.",
+        { variant: "error" }
+      );
     }
   }
 

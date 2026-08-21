@@ -171,7 +171,10 @@ const schemas = {
       gasStation: z.string().optional().nullable(),
       responsible: z.string().optional().nullable(),
       notes: z.string().optional().nullable(),
-      consumptionRate: z.coerce.number().positive().optional().nullable(),
+      consumptionRate: z.preprocess(
+        (val) => (val === "" ? undefined : val),
+        z.coerce.number().positive().optional().nullable()
+      ),
     })
     .passthrough(),
 
