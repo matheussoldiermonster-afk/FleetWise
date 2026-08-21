@@ -174,6 +174,17 @@ function Header() {
             gap: 2,
           }}
         >
+          <Box
+            component="img"
+            src="/carro-fleetwise.gif"
+            alt="FleetWise"
+            sx={{
+              height: 40,
+              width: "auto",
+              display: { xs: "none", sm: "block" },
+            }}
+          />
+
           <Box ref={searchBoxRef} sx={{ position: "relative" }}>
             <TextField
               size="small"
